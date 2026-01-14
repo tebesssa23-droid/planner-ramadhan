@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == "islemsid1702@gmail.com";
+    }
+
+    // Invitations list (document id = email lowercased)
+    match /invites/{emailId} {
+      allow read: if request.auth != null;   // allow signed-in users to check
+      allow write: if isAdmin();
+    }
+
+    // User entries
+    match /users/{userId}/entries/{entryId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
